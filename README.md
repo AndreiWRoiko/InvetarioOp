@@ -1,2 +1,0 @@
-# InvetarioOp
-InventariodeOperação
