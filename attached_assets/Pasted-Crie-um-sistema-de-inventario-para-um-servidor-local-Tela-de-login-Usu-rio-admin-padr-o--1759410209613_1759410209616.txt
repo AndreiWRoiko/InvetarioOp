@@ -1,0 +1,93 @@
+Crie um sistema de inventario para um servidor local.
+  Tela de login
+    Usuário admin padrão
+    Parte de cadastro e autorização de novos usuários, com um painel de gestão.
+      Validar e direcionar a uma das opções de visualização
+        Admin(Usar tudo como o usuário padrão)
+        Suporte(fazer o controle do inventario e modificação dos itens)
+        Controle(Faz a verificação de dashboards e somente os inventarios)
+  Tela de inventario 
+    Criar uma tela de cadastro de usuário
+      Funcionaria como cadastro de novo equipamento e teria as seguintes opções para cadastrar
+        Notebook(
+          -Responsavel pelo equipamento
+          -UF
+          -Centro de Custo
+          -Segmento
+          -CNPJ
+          -Modelo do Notebook
+          -Fornecedor == ("MAGNA","OPUS","ONLY","ALLU")
+          -Status da Maquina == ("EM USO","DEVOLVER","CORREIO","GUARDADO")
+          -Processador 
+          -Senha Admin
+          -Patrimonio
+          -Data de Recebimento
+          -Valor do equipamento
+          -Data de checagem 
+            'Com base em quando ele alterou algum item ele precisar alterar a data de checagem'
+          -Termo
+            'Uma opção para adicionar o link do termo'
+          -Foto do equipamento
+            'Uma opção para adicionar o link do termo'
+          --------------------------------------------
+          Checklist
+            dentro dele vai ter uma opção de adicionar checks para as seguintes opções.
+              -Termo
+              -Antivirus
+              -Ferramenta A
+              -Ferramenta B
+        )
+        Celular(
+          -Responsavel pelo equipamento
+          -Numero do Celular
+          -UF
+          -Centro de Custo
+          -Segmento
+          -CNPJ
+          -Modelo do Celular
+          -Status do Celular == ("EM USO","DEVOLVER","CORREIO","GUARDADO")
+          -Email de login
+          -senha de login
+          -Email de Supervisão
+          -senha de Supervisão
+          -IMEI
+          -Data de Recebimento
+          -Valor do equipamento
+          -Data de checagem 
+            'Com base em quando ele alterou algum item ele precisar alterar a data de checagem'
+          -Termo
+            'Uma opção para adicionar o link do termo'
+          -Foto do equipamento
+            'Uma opção para adicionar o link do termo'
+        )
+        Terminal(
+          -Numero do Relogio
+          -Status do Terminal == ("EM USO","DEVOLVER","CORREIO","GUARDADO", "TROCA")
+          -UF
+          -Segmento
+          -Centro de Custo
+          -Statu Next 
+          -Observação
+            'Uma caixa de texto'
+          -Data de checagem 
+            'Com base em quando ele alterou algum item ele precisar alterar a data de checagem'
+          -Termo
+            'Uma opção para adicionar o link do termo'
+          -Foto do equipamento
+            'Uma opção para adicionar o link do termo'
+        )
+      
+    Tela de visualização de inventarios
+        Uma tela com todos os itens do inventario cadastrados em linha
+          Opção de Filtros
+          Opção de Editar
+            Em cada linha deve ter os seguintes botões(
+              'Ver detalhes'
+              'Editar'
+              'Excluir'
+            )
+    Tela de Historico
+          Tela de verificação de modificação
+            Toda modificação desde exclusão até a mudança de uma unica linha deve ser visualizado neste tela com data e hora do ocorrido e quem fez.
+              
+          
