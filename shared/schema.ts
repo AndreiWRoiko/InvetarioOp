@@ -34,6 +34,7 @@ export const notebooks = pgTable("notebooks", {
   fornecedor: text("fornecedor").notNull(), // MAGNA, OPUS, ONLY, ALLU
   status: text("status").notNull(), // EM USO, DEVOLVER, CORREIO, GUARDADO
   processador: text("processador"),
+  office: text("office"),
   senhaAdmin: text("senha_admin"),
   patrimonio: text("patrimonio"),
   dataRecebimento: text("data_recebimento"),

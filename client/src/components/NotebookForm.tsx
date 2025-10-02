@@ -14,6 +14,7 @@ interface NotebookFormData {
   fornecedor: string;
   status: string;
   processador: string;
+  office: string;
   senhaAdmin: string;
   patrimonio: string;
   dataRecebimento: string;
@@ -154,6 +155,20 @@ export default function NotebookForm({ data, onChange }: NotebookFormProps) {
               onChange={(e) => updateField("processador", e.target.value)}
               data-testid="input-processador"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="office">Office</Label>
+            <Select value={data.office} onValueChange={(val) => updateField("office", val)}>
+              <SelectTrigger id="office" data-testid="select-office">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NÃO LICENCIADO">NÃO LICENCIADO</SelectItem>
+                <SelectItem value="OFFICE BASIC">OFFICE BASIC</SelectItem>
+                <SelectItem value="OFFICE STANDARD">OFFICE STANDARD</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">
