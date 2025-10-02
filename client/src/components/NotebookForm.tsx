@@ -92,12 +92,21 @@ export default function NotebookForm({ data, onChange }: NotebookFormProps) {
 
           <div className="space-y-2">
             <Label htmlFor="cnpj">CNPJ</Label>
-            <Input
-              id="cnpj"
-              value={data.cnpj || ""}
-              onChange={(e) => updateField("cnpj", e.target.value)}
-              data-testid="input-cnpj"
-            />
+            <Select value={data.cnpj} onValueChange={(val) => updateField("cnpj", val)}>
+              <SelectTrigger id="cnpj" data-testid="select-cnpj">
+                <SelectValue placeholder="Selecione" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ATENAS SERVIÇO DE APOIO LTDA - CNPJ: 24.329.959/0001-33">ATENAS SERVIÇO DE APOIO LTDA - CNPJ: 24.329.959/0001-33</SelectItem>
+                <SelectItem value="TELOS CONSULTORIA EMPRESARIAL LTDA - CNPJ: 15.541.957/0001-12">TELOS CONSULTORIA EMPRESARIAL LTDA - CNPJ: 15.541.957/0001-12</SelectItem>
+                <SelectItem value="OPUS CONSULTORIA LTDA - CNPJ: 14.706.283/0001-04">OPUS CONSULTORIA LTDA - CNPJ: 14.706.283/0001-04</SelectItem>
+                <SelectItem value="OPUS CONSULTORIA LTDA - CNPJ: 14.706.283/0002-87">OPUS CONSULTORIA LTDA - CNPJ: 14.706.283/0002-87</SelectItem>
+                <SelectItem value="OPUS SERVIÇOS ESPECIALIZADOS LTDA - CNPJ: 42.537.087/0001-80">OPUS SERVIÇOS ESPECIALIZADOS LTDA - CNPJ: 42.537.087/0001-80</SelectItem>
+                <SelectItem value="OPUS MANUTENCAO LTDA - CNPJ: 49.996.326/0001-00">OPUS MANUTENCAO LTDA - CNPJ: 49.996.326/0001-00</SelectItem>
+                <SelectItem value="OPUS LOGISTICA LTDA - CNPJ: 50.016.866/0001-69">OPUS LOGISTICA LTDA - CNPJ: 50.016.866/0001-69</SelectItem>
+                <SelectItem value="OPUS SERVICOS ESPECIALIZADOS LTDA - CNPJ: 42.537.087/0002-61">OPUS SERVICOS ESPECIALIZADOS LTDA - CNPJ: 42.537.087/0002-61</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </CardContent>
       </Card>
