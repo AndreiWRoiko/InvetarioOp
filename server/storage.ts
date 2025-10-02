@@ -9,8 +9,15 @@ import {
   type InsertTerminal,
   type Historico,
   type InsertHistorico,
+  users,
+  notebooks,
+  celulares,
+  terminais,
+  historico,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
+import { db } from "./db";
+import { eq, desc } from "drizzle-orm";
 
 export interface IStorage {
   // Usuários
@@ -146,6 +153,7 @@ export class MemStorage implements IStorage {
       checklistAntivirus: insertNotebook.checklistAntivirus ?? false,
       checklistFerramentaA: insertNotebook.checklistFerramentaA ?? false,
       checklistFerramentaB: insertNotebook.checklistFerramentaB ?? false,
+      office: insertNotebook.office ?? null,
       createdAt: now,
       updatedAt: now,
     };
@@ -294,4 +302,248 @@ export class MemStorage implements IStorage {
   }
 }
 
-export const storage = new MemStorage();
+// DatabaseStorage implementation using Drizzle ORM
+export class DatabaseStorage implements IStorage {
+  // Usuários
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const id = randomUUID();
+    const [user] = await db
+      .insert(users)
+      .values({
+        id,
+        nome: insertUser.nome,
+        email: insertUser.email,
+        senha: insertUser.senha,
+        perfil: insertUser.perfil,
+        ativo: insertUser.ativo ?? true,
+        createdAt: new Date(),
+      })
+      .returning();
+    return user;
+  }
+
+  async updateUser(id: string, updateData: Partial<InsertUser>): Promise<User | undefined> {
+    const [user] = await db
+      .update(users)
+      .set(updateData)
+      .where(eq(users.id, id))
+      .returning();
+    return user || undefined;
+  }
+
+  async deleteUser(id: string): Promise<boolean> {
+    const result = await db.delete(users).where(eq(users.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  // Notebooks
+  async getNotebook(id: string): Promise<Notebook | undefined> {
+    const [notebook] = await db.select().from(notebooks).where(eq(notebooks.id, id));
+    return notebook || undefined;
+  }
+
+  async createNotebook(insertNotebook: InsertNotebook): Promise<Notebook> {
+    const id = randomUUID();
+    const now = new Date();
+    const [notebook] = await db
+      .insert(notebooks)
+      .values({
+        id,
+        responsavel: insertNotebook.responsavel,
+        uf: insertNotebook.uf,
+        centroCusto: insertNotebook.centroCusto ?? null,
+        segmento: insertNotebook.segmento,
+        cnpj: insertNotebook.cnpj ?? null,
+        modelo: insertNotebook.modelo,
+        fornecedor: insertNotebook.fornecedor,
+        status: insertNotebook.status,
+        processador: insertNotebook.processador ?? null,
+        senhaAdmin: insertNotebook.senhaAdmin ?? null,
+        patrimonio: insertNotebook.patrimonio ?? null,
+        dataRecebimento: insertNotebook.dataRecebimento ?? null,
+        valor: insertNotebook.valor ?? null,
+        dataChecagem: insertNotebook.dataChecagem ?? null,
+        termoLink: insertNotebook.termoLink ?? null,
+        fotoLink: insertNotebook.fotoLink ?? null,
+        checklistTermo: insertNotebook.checklistTermo ?? false,
+        checklistAntivirus: insertNotebook.checklistAntivirus ?? false,
+        checklistFerramentaA: insertNotebook.checklistFerramentaA ?? false,
+        checklistFerramentaB: insertNotebook.checklistFerramentaB ?? false,
+        office: insertNotebook.office ?? null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    return notebook;
+  }
+
+  async updateNotebook(id: string, updateData: Partial<InsertNotebook>): Promise<Notebook | undefined> {
+    const [notebook] = await db
+      .update(notebooks)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(notebooks.id, id))
+      .returning();
+    return notebook || undefined;
+  }
+
+  async deleteNotebook(id: string): Promise<boolean> {
+    const result = await db.delete(notebooks).where(eq(notebooks.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async getAllNotebooks(): Promise<Notebook[]> {
+    return await db.select().from(notebooks);
+  }
+
+  // Celulares
+  async getCelular(id: string): Promise<Celular | undefined> {
+    const [celular] = await db.select().from(celulares).where(eq(celulares.id, id));
+    return celular || undefined;
+  }
+
+  async createCelular(insertCelular: InsertCelular): Promise<Celular> {
+    const id = randomUUID();
+    const now = new Date();
+    const [celular] = await db
+      .insert(celulares)
+      .values({
+        id,
+        responsavel: insertCelular.responsavel,
+        numeroCelular: insertCelular.numeroCelular,
+        uf: insertCelular.uf,
+        centroCusto: insertCelular.centroCusto ?? null,
+        segmento: insertCelular.segmento,
+        cnpj: insertCelular.cnpj ?? null,
+        modelo: insertCelular.modelo,
+        status: insertCelular.status,
+        emailLogin: insertCelular.emailLogin ?? null,
+        senhaLogin: insertCelular.senhaLogin ?? null,
+        emailSupervisao: insertCelular.emailSupervisao ?? null,
+        senhaSupervisao: insertCelular.senhaSupervisao ?? null,
+        imei: insertCelular.imei ?? null,
+        dataRecebimento: insertCelular.dataRecebimento ?? null,
+        valor: insertCelular.valor ?? null,
+        dataChecagem: insertCelular.dataChecagem ?? null,
+        termoLink: insertCelular.termoLink ?? null,
+        fotoLink: insertCelular.fotoLink ?? null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    return celular;
+  }
+
+  async updateCelular(id: string, updateData: Partial<InsertCelular>): Promise<Celular | undefined> {
+    const [celular] = await db
+      .update(celulares)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(celulares.id, id))
+      .returning();
+    return celular || undefined;
+  }
+
+  async deleteCelular(id: string): Promise<boolean> {
+    const result = await db.delete(celulares).where(eq(celulares.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async getAllCelulares(): Promise<Celular[]> {
+    return await db.select().from(celulares);
+  }
+
+  // Terminais
+  async getTerminal(id: string): Promise<Terminal | undefined> {
+    const [terminal] = await db.select().from(terminais).where(eq(terminais.id, id));
+    return terminal || undefined;
+  }
+
+  async createTerminal(insertTerminal: InsertTerminal): Promise<Terminal> {
+    const id = randomUUID();
+    const now = new Date();
+    const [terminal] = await db
+      .insert(terminais)
+      .values({
+        id,
+        numeroRelogio: insertTerminal.numeroRelogio,
+        status: insertTerminal.status,
+        uf: insertTerminal.uf,
+        segmento: insertTerminal.segmento,
+        centroCusto: insertTerminal.centroCusto ?? null,
+        statusNext: insertTerminal.statusNext ?? null,
+        observacao: insertTerminal.observacao ?? null,
+        dataChecagem: insertTerminal.dataChecagem ?? null,
+        termoLink: insertTerminal.termoLink ?? null,
+        fotoLink: insertTerminal.fotoLink ?? null,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
+    return terminal;
+  }
+
+  async updateTerminal(id: string, updateData: Partial<InsertTerminal>): Promise<Terminal | undefined> {
+    const [terminal] = await db
+      .update(terminais)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(terminais.id, id))
+      .returning();
+    return terminal || undefined;
+  }
+
+  async deleteTerminal(id: string): Promise<boolean> {
+    const result = await db.delete(terminais).where(eq(terminais.id, id));
+    return result.rowCount ? result.rowCount > 0 : false;
+  }
+
+  async getAllTerminais(): Promise<Terminal[]> {
+    return await db.select().from(terminais);
+  }
+
+  // Histórico
+  async createHistorico(insertHistorico: InsertHistorico): Promise<Historico> {
+    const id = randomUUID();
+    const [hist] = await db
+      .insert(historico)
+      .values({
+        id,
+        action: insertHistorico.action,
+        userId: insertHistorico.userId,
+        userName: insertHistorico.userName,
+        equipmentType: insertHistorico.equipmentType,
+        equipmentId: insertHistorico.equipmentId ?? null,
+        details: insertHistorico.details,
+        equipment: insertHistorico.equipment ?? null,
+        timestamp: new Date(),
+      })
+      .returning();
+    return hist;
+  }
+
+  async getAllHistorico(): Promise<Historico[]> {
+    return await db.select().from(historico).orderBy(desc(historico.timestamp));
+  }
+
+  async getHistoricoByEquipment(equipmentId: string): Promise<Historico[]> {
+    return await db
+      .select()
+      .from(historico)
+      .where(eq(historico.equipmentId, equipmentId))
+      .orderBy(desc(historico.timestamp));
+  }
+}
+
+export const storage = new DatabaseStorage();
