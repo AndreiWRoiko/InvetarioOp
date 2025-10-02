@@ -5,6 +5,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import AppSidebar from "@/components/AppSidebar";
 import Login from "@/pages/Login";
 import Dashboard from "@/pages/Dashboard";
@@ -70,8 +72,11 @@ function AppContent() {
         <div className="flex flex-col flex-1">
           <header className="flex items-center justify-between p-4 border-b">
             <SidebarTrigger data-testid="button-sidebar-toggle" />
-            <div className="text-sm text-muted-foreground">
-              <span className="font-medium text-foreground">{user.nome}</span> - {userRole}
+            <div className="flex items-center gap-4">
+              <div className="text-sm text-muted-foreground">
+                <span className="font-medium text-foreground">{user.nome}</span> - {userRole}
+              </div>
+              <ThemeToggle />
             </div>
           </header>
           <main className="flex-1 overflow-auto p-8">
@@ -86,12 +91,14 @@ function AppContent() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <AuthProvider>
-          <AppContent />
-          <Toaster />
-        </AuthProvider>
-      </TooltipProvider>
+      <ThemeProvider>
+        <TooltipProvider>
+          <AuthProvider>
+            <AppContent />
+            <Toaster />
+          </AuthProvider>
+        </TooltipProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

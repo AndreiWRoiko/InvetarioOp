@@ -36,13 +36,17 @@ Sistema completo de gerenciamento de inventário para servidor local, com autent
 
 ### Gestão de Equipamentos
 - Três tipos de equipamentos:
-  - **Notebooks**: 20+ campos incluindo responsável, modelo, fornecedor, status, etc.
+  - **Notebooks**: 20+ campos incluindo responsável, modelo, fornecedor, status, licença Office, CNPJ, etc.
   - **Celulares**: Campos específicos como IMEI, número, emails de login/supervisão
   - **Terminais**: Campos como número do relógio, status, status next
 - CRUD completo para todos os tipos
 - Filtros avançados: busca, status, UF, segmento, fornecedor
 - Visualização em abas (Todos, Notebooks, Celulares, Terminais)
 - Confirmação de exclusão com AlertDialog
+- Campos padronizados com dropdowns:
+  - **UF**: Todos os 27 estados brasileiros (AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO)
+  - **CNPJ**: 8 empresas pré-cadastradas (ATENAS, TELOS, OPUS e suas filiais)
+  - **Office**: 3 opções (NÃO LICENCIADO, OFFICE BASIC, OFFICE STANDARD)
 
 ### Dashboard
 - Métricas em tempo real:
@@ -135,7 +139,8 @@ Sistema completo de gerenciamento de inventário para servidor local, com autent
 - Paleta de cores baseada em Material Design com abordagem enterprise
 - Componentes shadcn/ui customizados
 - Sistema de sidebar responsivo
-- Dark mode não implementado (apenas light mode)
+- **Dark mode implementado** com alternância via botão no header
+- Tema persiste no localStorage
 - Design guidelines em `design_guidelines.md`
 
 ## Estado Atual
@@ -151,9 +156,20 @@ Sistema completo de gerenciamento de inventário para servidor local, com autent
 ✅ Filtros e busca avançada
 ✅ Interface totalmente em português do Brasil
 
+## Alterações Recentes (Outubro 2025)
+- ✅ **Campo Office**: Adicionado dropdown com 3 opções de licença Office nos notebooks
+- ✅ **Campo CNPJ**: Convertido para dropdown com 8 empresas pré-cadastradas
+- ✅ **Estados completos**: Campo UF expandido para incluir todos os 27 estados do Brasil
+- ✅ **Dark Mode**: Implementado tema escuro com:
+  - ThemeProvider para gerenciamento de estado
+  - ThemeToggle com ícones (Sol/Lua) no header
+  - Persistência da preferência no localStorage
+  - Variáveis CSS completas para light/dark mode
+  - Transições suaves entre temas
+
 ## Próximos Passos Sugeridos
 - Migrar storage em memória para PostgreSQL usando Drizzle ORM
-- Implementar edição de equipamentos (atualmente em desenvolvimento)
+- Implementar edição de equipamentos
 - Adicionar visualização detalhada de equipamentos
 - Implementar edição de perfil de usuário
 - Adicionar paginação para grandes listas
