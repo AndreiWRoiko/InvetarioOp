@@ -1,6 +1,6 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Eye, Pencil, Trash2 } from "lucide-react";
+import { Eye, Pencil, Trash2, History } from "lucide-react";
 import StatusBadge from "./StatusBadge";
 
 interface Equipment {
@@ -18,6 +18,7 @@ interface EquipmentTableProps {
   onView: (id: string) => void;
   onEdit: (id: string) => void;
   onDelete: (id: string) => void;
+  onHistory: (id: string) => void;
   canEdit?: boolean;
   canDelete?: boolean;
 }
@@ -27,6 +28,7 @@ export default function EquipmentTable({
   onView,
   onEdit,
   onDelete,
+  onHistory,
   canEdit = true,
   canDelete = true,
 }: EquipmentTableProps) {
@@ -71,6 +73,14 @@ export default function EquipmentTable({
                       data-testid={`button-view-${item.id}`}
                     >
                       <Eye className="w-4 h-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => onHistory(item.id)}
+                      data-testid={`button-history-${item.id}`}
+                    >
+                      <History className="w-4 h-4" />
                     </Button>
                     {canEdit && (
                       <Button

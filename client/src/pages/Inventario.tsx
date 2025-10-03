@@ -17,7 +17,17 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import type { Notebook, Celular, Terminal } from "@shared/schema";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { format } from "date-fns";
+import { Clock, User, FileEdit } from "lucide-react";
+import type { Notebook, Celular, Terminal, Historico } from "@shared/schema";
 
 interface InventarioProps {
   userRole?: "Admin" | "Suporte" | "Controle";
@@ -43,6 +53,8 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
   const [fornecedorFilter, setFornecedorFilter] = useState("");
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [equipmentToDelete, setEquipmentToDelete] = useState<{ id: string; tipo: string } | null>(null);
+  const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
+  const [selectedEquipmentId, setSelectedEquipmentId] = useState<string | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -56,6 +68,17 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
 
   const { data: terminais = [], isLoading: loadingTerminais } = useQuery<Terminal[]>({
     queryKey: ["/api/terminais"],
+  });
+
+  const { data: equipmentHistory = [], isLoading: loadingHistory } = useQuery<Historico[]>({
+    queryKey: ["/api/historico/equipment", selectedEquipmentId],
+    queryFn: async () => {
+      if (!selectedEquipmentId) return [];
+      const response = await fetch(`/api/historico/equipment/${selectedEquipmentId}`);
+      if (!response.ok) throw new Error("Failed to fetch history");
+      return response.json();
+    },
+    enabled: !!selectedEquipmentId,
   });
 
   const deleteMutation = useMutation({
@@ -180,6 +203,11 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
     }
   };
 
+  const handleHistory = (id: string) => {
+    setSelectedEquipmentId(id);
+    setHistoryDialogOpen(true);
+  };
+
   const confirmDelete = () => {
     if (equipmentToDelete) {
       deleteMutation.mutate(equipmentToDelete);
@@ -232,6 +260,7 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
             onView={handleView}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onHistory={handleHistory}
             canEdit={userRole !== "Controle"}
             canDelete={userRole === "Admin"}
           />
@@ -258,6 +287,66 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={historyDialogOpen} onOpenChange={(open) => {
+        setHistoryDialogOpen(open);
+        if (!open) setSelectedEquipmentId(null);
+      }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Histórico do Equipamento</DialogTitle>
+            <DialogDescription>
+              Registro de todas as modificações realizadas neste equipamento
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[500px] pr-4">
+            {loadingHistory ? (
+              <div className="space-y-4">
+                <Skeleton className="h-20" />
+                <Skeleton className="h-20" />
+                <Skeleton className="h-20" />
+              </div>
+            ) : equipmentHistory.length === 0 ? (
+              <div className="text-center text-muted-foreground py-8">
+                Nenhum histórico encontrado para este equipamento
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {equipmentHistory.map((entry) => (
+                  <div
+                    key={entry.id}
+                    className="border rounded-lg p-4 space-y-2 bg-card"
+                    data-testid={`history-entry-${entry.id}`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center gap-2">
+                        <FileEdit className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-medium">
+                          {entry.action === "criacao" && "Criação"}
+                          {entry.action === "edicao" && "Edição"}
+                          {entry.action === "exclusao" && "Exclusão"}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Clock className="w-3 h-3" />
+                        {format(new Date(entry.timestamp), "dd/MM/yyyy HH:mm")}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm">
+                      <User className="w-3 h-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">{entry.userName}</span>
+                    </div>
+                    <p className="text-sm">{entry.details}</p>
+                    {entry.equipment && (
+                      <p className="text-sm text-muted-foreground italic">{entry.equipment}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

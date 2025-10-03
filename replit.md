@@ -166,9 +166,13 @@ Sistema completo de gerenciamento de inventário para servidor local, com autent
   - Persistência da preferência no localStorage
   - Variáveis CSS completas para light/dark mode
   - Transições suaves entre temas
+- ✅ **Histórico Individual por Equipamento**: 
+  - Botão de histórico adicionado na tabela de inventário
+  - Dialog modal exibindo todas as modificações do equipamento
+  - Exibe criação, edição e exclusão com timestamp e usuário
+  - Integrado com a API `/api/historico/equipment/:equipmentId`
 
 ## Próximos Passos Sugeridos
-- Migrar storage em memória para PostgreSQL usando Drizzle ORM
 - Implementar edição de equipamentos
 - Adicionar visualização detalhada de equipamentos
 - Implementar edição de perfil de usuário
