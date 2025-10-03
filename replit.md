@@ -171,10 +171,20 @@ Sistema completo de gerenciamento de inventário para servidor local, com autent
   - Dialog modal exibindo todas as modificações do equipamento
   - Exibe criação, edição e exclusão com timestamp e usuário
   - Integrado com a API `/api/historico/equipment/:equipmentId`
+- ✅ **Visualização Detalhada de Equipamentos**:
+  - Botão "Ver" adicionado na tabela de inventário
+  - Dialog modal exibindo todos os campos do equipamento
+  - Layout específico para cada tipo (Notebook, Celular, Terminal)
+  - Ícones distintos para cada tipo de equipamento
+  - StatusBadge colorido para status
+  - Checklist visual para notebooks (checkmarks verdes)
+  - Links clicáveis para termo e foto
+  - Campos sensíveis (senhas) em fonte monoespaçada
+  - Grid responsivo de 2 colunas para organização
+  - ScrollArea para equipamentos com muitos campos
 
 ## Próximos Passos Sugeridos
 - Implementar edição de equipamentos
-- Adicionar visualização detalhada de equipamentos
 - Implementar edição de perfil de usuário
 - Adicionar paginação para grandes listas
 - Implementar exportação de dados (CSV/Excel)
