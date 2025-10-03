@@ -26,7 +26,9 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { format } from "date-fns";
-import { Clock, User, FileEdit } from "lucide-react";
+import { Clock, User, FileEdit, Laptop, Smartphone, Monitor, CheckCircle, XCircle } from "lucide-react";
+import StatusBadge from "@/components/StatusBadge";
+import { Badge } from "@/components/ui/badge";
 import type { Notebook, Celular, Terminal, Historico } from "@shared/schema";
 
 interface InventarioProps {
@@ -55,6 +57,8 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
   const [equipmentToDelete, setEquipmentToDelete] = useState<{ id: string; tipo: string } | null>(null);
   const [historyDialogOpen, setHistoryDialogOpen] = useState(false);
   const [selectedEquipmentId, setSelectedEquipmentId] = useState<string | null>(null);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [viewEquipment, setViewEquipment] = useState<{ id: string; tipo: string } | null>(null);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -182,10 +186,11 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
   }, [allEquipment, activeTab, searchQuery, statusFilter, ufFilter, segmentoFilter, fornecedorFilter]);
 
   const handleView = (id: string) => {
-    toast({
-      title: "Visualizar Equipamento",
-      description: `Funcionalidade em desenvolvimento`,
-    });
+    const equipment = allEquipment.find(e => e.id === id);
+    if (equipment) {
+      setViewEquipment({ id, tipo: equipment.tipo });
+      setViewDialogOpen(true);
+    }
   };
 
   const handleEdit = (id: string) => {
@@ -207,6 +212,19 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
     setSelectedEquipmentId(id);
     setHistoryDialogOpen(true);
   };
+
+  const currentEquipment = useMemo(() => {
+    if (!viewEquipment) return null;
+    
+    if (viewEquipment.tipo === "Notebook") {
+      return notebooks.find(n => n.id === viewEquipment.id);
+    } else if (viewEquipment.tipo === "Celular") {
+      return celulares.find(c => c.id === viewEquipment.id);
+    } else if (viewEquipment.tipo === "Terminal") {
+      return terminais.find(t => t.id === viewEquipment.id);
+    }
+    return null;
+  }, [viewEquipment, notebooks, celulares, terminais]);
 
   const confirmDelete = () => {
     if (equipmentToDelete) {
@@ -342,6 +360,315 @@ export default function Inventario({ userRole = "Admin" }: InventarioProps) {
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+          </ScrollArea>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={viewDialogOpen} onOpenChange={(open) => {
+        setViewDialogOpen(open);
+        if (!open) setViewEquipment(null);
+      }}>
+        <DialogContent className="max-w-3xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {viewEquipment?.tipo === "Notebook" && <Laptop className="w-5 h-5" />}
+              {viewEquipment?.tipo === "Celular" && <Smartphone className="w-5 h-5" />}
+              {viewEquipment?.tipo === "Terminal" && <Monitor className="w-5 h-5" />}
+              Detalhes do {viewEquipment?.tipo}
+            </DialogTitle>
+            <DialogDescription>
+              Visualização completa das informações do equipamento
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[calc(90vh-150px)] pr-4">
+            {!currentEquipment ? (
+              <div className="text-center text-muted-foreground py-8">
+                Equipamento não encontrado
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {viewEquipment?.tipo === "Notebook" && (
+                  <>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Responsável</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).responsavel}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Status</p>
+                        <StatusBadge status={(currentEquipment as Notebook).status} />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">UF</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).uf}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Segmento</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).segmento}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Modelo</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).modelo}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Fornecedor</p>
+                        <Badge variant="outline">{(currentEquipment as Notebook).fornecedor}</Badge>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Centro de Custo</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).centroCusto || "—"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">CNPJ</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).cnpj || "—"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Processador</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).processador || "—"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Office</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).office || "—"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Senha Admin</p>
+                        <p className="text-sm font-mono text-xs">{(currentEquipment as Notebook).senhaAdmin || "—"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Patrimônio</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).patrimonio || "—"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Data Recebimento</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).dataRecebimento || "—"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Valor</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).valor ? `R$ ${(currentEquipment as Notebook).valor}` : "—"}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-sm font-medium text-muted-foreground">Data Checagem</p>
+                        <p className="text-sm">{(currentEquipment as Notebook).dataChecagem || "—"}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-semibold">Checklist</h4>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="flex items-center gap-2">
+                          {(currentEquipment as Notebook).checklistTermo ? 
+                            <CheckCircle className="w-4 h-4 text-green-500" /> : 
+                            <XCircle className="w-4 h-4 text-muted-foreground" />
+                          }
+                          <span className="text-sm">Termo</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {(currentEquipment as Notebook).checklistAntivirus ? 
+                            <CheckCircle className="w-4 h-4 text-green-500" /> : 
+                            <XCircle className="w-4 h-4 text-muted-foreground" />
+                          }
+                          <span className="text-sm">Antivírus</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {(currentEquipment as Notebook).checklistFerramentaA ? 
+                            <CheckCircle className="w-4 h-4 text-green-500" /> : 
+                            <XCircle className="w-4 h-4 text-muted-foreground" />
+                          }
+                          <span className="text-sm">Ferramenta A</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {(currentEquipment as Notebook).checklistFerramentaB ? 
+                            <CheckCircle className="w-4 h-4 text-green-500" /> : 
+                            <XCircle className="w-4 h-4 text-muted-foreground" />
+                          }
+                          <span className="text-sm">Ferramenta B</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-semibold">Links</h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-muted-foreground">Termo</p>
+                          {(currentEquipment as Notebook).termoLink ? (
+                            <a href={(currentEquipment as Notebook).termoLink!} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline break-all">
+                              {(currentEquipment as Notebook).termoLink}
+                            </a>
+                          ) : (
+                            <p className="text-sm">—</p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-muted-foreground">Foto</p>
+                          {(currentEquipment as Notebook).fotoLink ? (
+                            <a href={(currentEquipment as Notebook).fotoLink!} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline break-all">
+                              {(currentEquipment as Notebook).fotoLink}
+                            </a>
+                          ) : (
+                            <p className="text-sm">—</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {viewEquipment?.tipo === "Celular" && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Responsável</p>
+                      <p className="text-sm">{(currentEquipment as Celular).responsavel}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Status</p>
+                      <StatusBadge status={(currentEquipment as Celular).status} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">UF</p>
+                      <p className="text-sm">{(currentEquipment as Celular).uf}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Segmento</p>
+                      <p className="text-sm">{(currentEquipment as Celular).segmento}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Modelo</p>
+                      <p className="text-sm">{(currentEquipment as Celular).modelo}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">IMEI</p>
+                      <p className="text-sm font-mono text-xs">{(currentEquipment as Celular).imei || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Número Celular</p>
+                      <p className="text-sm">{(currentEquipment as Celular).numeroCelular}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Centro de Custo</p>
+                      <p className="text-sm">{(currentEquipment as Celular).centroCusto || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">CNPJ</p>
+                      <p className="text-sm">{(currentEquipment as Celular).cnpj || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Email Login</p>
+                      <p className="text-sm break-all">{(currentEquipment as Celular).emailLogin || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Senha Login</p>
+                      <p className="text-sm font-mono text-xs">{(currentEquipment as Celular).senhaLogin || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Email Supervisão</p>
+                      <p className="text-sm break-all">{(currentEquipment as Celular).emailSupervisao || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Senha Supervisão</p>
+                      <p className="text-sm font-mono text-xs">{(currentEquipment as Celular).senhaSupervisao || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Data Recebimento</p>
+                      <p className="text-sm">{(currentEquipment as Celular).dataRecebimento || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Valor</p>
+                      <p className="text-sm">{(currentEquipment as Celular).valor ? `R$ ${(currentEquipment as Celular).valor}` : "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Data Checagem</p>
+                      <p className="text-sm">{(currentEquipment as Celular).dataChecagem || "—"}</p>
+                    </div>
+                    <div className="space-y-1 col-span-2">
+                      <h4 className="text-sm font-semibold mb-2">Links</h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-muted-foreground">Termo</p>
+                          {(currentEquipment as Celular).termoLink ? (
+                            <a href={(currentEquipment as Celular).termoLink!} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline break-all">
+                              {(currentEquipment as Celular).termoLink}
+                            </a>
+                          ) : (
+                            <p className="text-sm">—</p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-muted-foreground">Foto</p>
+                          {(currentEquipment as Celular).fotoLink ? (
+                            <a href={(currentEquipment as Celular).fotoLink!} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline break-all">
+                              {(currentEquipment as Celular).fotoLink}
+                            </a>
+                          ) : (
+                            <p className="text-sm">—</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {viewEquipment?.tipo === "Terminal" && (
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Número do Relógio</p>
+                      <p className="text-sm font-semibold">{(currentEquipment as Terminal).numeroRelogio}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Status</p>
+                      <StatusBadge status={(currentEquipment as Terminal).status} />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">UF</p>
+                      <p className="text-sm">{(currentEquipment as Terminal).uf}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Segmento</p>
+                      <p className="text-sm">{(currentEquipment as Terminal).segmento}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Centro de Custo</p>
+                      <p className="text-sm">{(currentEquipment as Terminal).centroCusto || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Status Next</p>
+                      <p className="text-sm">{(currentEquipment as Terminal).statusNext || "—"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-sm font-medium text-muted-foreground">Data Checagem</p>
+                      <p className="text-sm">{(currentEquipment as Terminal).dataChecagem || "—"}</p>
+                    </div>
+                    <div className="space-y-1 col-span-2">
+                      <p className="text-sm font-medium text-muted-foreground">Observação</p>
+                      <p className="text-sm">{(currentEquipment as Terminal).observacao || "—"}</p>
+                    </div>
+                    <div className="space-y-1 col-span-2">
+                      <h4 className="text-sm font-semibold mb-2">Links</h4>
+                      <div className="grid grid-cols-1 gap-2">
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-muted-foreground">Termo</p>
+                          {(currentEquipment as Terminal).termoLink ? (
+                            <a href={(currentEquipment as Terminal).termoLink!} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline break-all">
+                              {(currentEquipment as Terminal).termoLink}
+                            </a>
+                          ) : (
+                            <p className="text-sm">—</p>
+                          )}
+                        </div>
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium text-muted-foreground">Foto</p>
+                          {(currentEquipment as Terminal).fotoLink ? (
+                            <a href={(currentEquipment as Terminal).fotoLink!} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-500 hover:underline break-all">
+                              {(currentEquipment as Terminal).fotoLink}
+                            </a>
+                          ) : (
+                            <p className="text-sm">—</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </ScrollArea>
